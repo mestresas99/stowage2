@@ -1,3 +1,0 @@
-N N E
-N E E
-X N X
