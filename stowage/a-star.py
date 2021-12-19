@@ -21,7 +21,7 @@ class Node():
         return self.position == other.position
 
 global position_all_containers #global variable for the position of all the containers
-position_all_containers={}
+position_all_containers = {}
 def readInputs(): #read files for each of the inputs
     if len(sys.argv)!=5:
         return len(sys.argv),len(sys.argv)
@@ -101,9 +101,8 @@ def hasArrived(container): #sees it the container is already in the destination 
 arrived = []
 def unload(container,port): #creates the child states that come from an unloading operation from the parent
     position_dict = position_all_containers.copy()
-    position = position_dict[container[0]]
-    pos = -1 - position
-    position_dict[container[0]] = [pos,pos] #-1 for por 0, -2 for port 1 and -3 for port 2
+    pos = -1 - port
+    position_dict[container[0]] = [pos,pos] #-1 for port 0, -2 for port 1 and -3 for port 2
     if container[2] == port:
         arrived.append(container[0])  #check if the port of unloading is the destination
     return position_dict
@@ -190,8 +189,11 @@ def recalculate_next_cell_available(containers): #recalculate the positions wher
         next_cell_available[j] = min_pos[j]
     print(min_pos)
         
-def astar(start, containers, map): #a-star implementation
+def astar(start, containers, map, position_all_containers): #a-star implementation
     start_node = Node(start)
+    start_node.containers = position_all_containers.copy()
+    print(position_all_containers)
+    print(start_node.containers)
     start_node.map = map
     open = []
     close = []
@@ -203,8 +205,7 @@ def astar(start, containers, map): #a-star implementation
     while len(open)>0 and not exit:
         current_node = open.pop(0)
         close.append(current_node)
-        global position_all_containers
-        position_all_containers = current_node.containers.copy()
+        position_all_containers.update(current_node.containers.copy())
         recalculate_next_cell_available(current_node.containers)
         print("next cell av loop" + str(next_cell_available))
         #check if it is goal
@@ -261,8 +262,6 @@ def astar(start, containers, map): #a-star implementation
             if found == False:
                 open.append(child) 
         open = bubble_sort(open) #sort the open vector from less cost to more
-        if len(open)>0: #just debugging
-            print(open[1].containers)
             
 
     if exit: #close should be change with path (to be fixed)
@@ -280,7 +279,7 @@ def main():
     print(containers) 
     start = 0 #home port
     start_time = time.time()
-    open, path = astar(start, containers, boat_map_2d)
+    open, path = astar(start, containers, boat_map_2d,position_all_containers)
     end_time = time.time()
     t = (end_time - start_time )*1000
     print(t)
