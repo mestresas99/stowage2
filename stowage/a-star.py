@@ -135,7 +135,6 @@ def heuristic1(node,containers): #checks the number of operations left for arriv
                     unloads +=1
     
     sails_to_finish = 2 - node.position
-    
     return (2 * num_to_load) + unloads + sails_to_finish
 
 
@@ -182,12 +181,10 @@ def recalculate_next_cell_available(containers): #recalculate the positions wher
     for i in containers.keys():
         if containers[i][0]>=0:
             if containers[i][0] - 1 < min_pos[containers[i][1]]:
-                print(containers[i][1])
-                print(containers[i][0] -1)
                 min_pos[containers[i][1]] = containers[i][0] - 1
     for j in range(len(min_pos)):
         next_cell_available[j] = min_pos[j]
-    print(min_pos)
+
         
 def astar(start, containers, map, position_all_containers): #a-star implementation
     start_node = Node(start)
@@ -207,39 +204,11 @@ def astar(start, containers, map, position_all_containers): #a-star implementati
         close.append(current_node)
         position_all_containers.update(current_node.containers.copy())
         recalculate_next_cell_available(current_node.containers)
-        print("next cell av loop" + str(next_cell_available))
         #check if it is goal
         if (len(arrived) == len(containers)): 
             exit = True
         
         children = generateChildren(current_node,containers)
-        # #generate childrens
-        # childrens = []
-        # for container in containers:
-        #     if (not isLoaded(container)) and (not hasArrived(container)) and (samePort(container,current_node.position)):
-        #         for i in range(len(next_cell_available)):
-        #             node = Node(current_node,current_node.position)
-        #             path.append(current_node)
-        #             if next_cell_available[i]!= -1 and isPossible(container,[next_cell_available[i],i]):
-        #                 #node.operator = ["load",container,[next_cell_available[i],i]]
-        #                 node.g = 10 + next_cell_available[i]
-        #                 childrens.append(node)
-        #     else: #container is in the ship loaded
-        #         if position_all_containers[container[0]][0] == next_cell_available[position_all_containers[container[0]][1]] + 1:
-        #             node = Node(current_node,current_node.position)
-        #             path.append(current_node)
-        #             for i in range(3):
-        #                 if i== current_node.position:
-        #                     #node.operator = ["unload",container,current_node.position]
-        #                     node.g = 15 + 2*next_cell_available[i]
-        #                     childrens.append(node)
-        # for i in range(3):
-        #     if i!= current_node.position:
-        #         node = Node(current_node,current_node.position)
-        #         path.append(current_node)
-        #         #node.operator = ["sail",i]
-        #         node.g = 3500 * np.abs(i-current_node.position)
-        #         childrens.append(node)
         
         for child in children: #see if the children are in the closed vector, in the open vector and change the cost if they are already in the open vector
             found = False
@@ -262,28 +231,24 @@ def astar(start, containers, map, position_all_containers): #a-star implementati
             if found == False:
                 open.append(child) 
         open = bubble_sort(open) #sort the open vector from less cost to more
-            
 
     if exit: #close should be change with path (to be fixed)
         solution = close
     else:
         solution = None
 
-    return open, solution
+    return solution
 
                         
 
 def main():
     boat_map_2d,containers = readInputs()
-    print(boat_map_2d)
-    print(containers) 
     start = 0 #home port
     start_time = time.time()
-    open, path = astar(start, containers, boat_map_2d,position_all_containers)
+    path = astar(start, containers, boat_map_2d,position_all_containers)
     end_time = time.time()
     t = (end_time - start_time )*1000
     print(t)
-    print(open)
     print(path)
 
 if __name__ == '__main__':
