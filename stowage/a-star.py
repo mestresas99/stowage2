@@ -195,7 +195,7 @@ def astar(start, containers, map, position_all_containers): #a-star implementati
     start_node.containers = position_all_containers.copy()
     open = []
     close = []
-    path = []
+    path_solution = []
     exit = False
     #add start node to open list
     open.append(start_node)
@@ -237,11 +237,11 @@ def astar(start, containers, map, position_all_containers): #a-star implementati
 
     if exit: #close should be change with path (to be fixed)
         print("i enter here")
-        while last_node.containers != start_node.containers and last_node.position!=start_node.position:
-            path.append(last_node)
+        while last_node.parent:
+            path_solution.append(last_node)
             last_node = last_node.parent
-        path.append(start_node)
-        solution = path
+        path_solution.append(start_node)
+        solution = path_solution
     else:
         solution = None
     return solution
