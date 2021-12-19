@@ -91,7 +91,6 @@ def isPossible(container,position): #sees if a position is correct (refrigerated
         else:
             return False
 
-arrived = []
 def unload(container,port): #creates the child states that come from an unloading operation from the parent
     position_dict = position_all_containers.copy()
     pos = -1 - port
@@ -161,20 +160,20 @@ def generateChildren(current_node,containers): #calls the load and unload method
     for container in containers:
         if (not isLoaded(container)) and (not hasArrived(current_node,container)) and (samePort(container,current_node.position)):
             for i in range(len(next_cell_available)):
-                node = Node(parent=current_node,position=current_node.position)
                 if next_cell_available[i]!= -1 and isPossible(container,[int(next_cell_available[i]),i]):
+                    node = Node(parent=current_node,position=current_node.position)
                     node.containers = load(container,[int(next_cell_available[i]),i])
                     node.g = 10 + next_cell_available[i]
                     children.append(node)
         else:
             if position_all_containers[container[0]][0] == next_cell_available[position_all_containers[container[0]][1]] + 1:
-                node = Node(parent = current_node,position=current_node.position)
+                node = Node(parent=current_node,position=current_node.position)
                 node.containers = unload(container,current_node.position)           
                 node.g = 15 + 2*next_cell_available[position_all_containers[container[0]][0]]
                 children.append(node)
     for i in range(3):
         if i!= current_node.position:
-            node = Node(parent = current_node, position=i) #works the same way as sail function
+            node = Node(parent=current_node, position=i) #works the same way as sail function
             node.containers = position_all_containers.copy()
             node.g = 3500 * np.abs(i-current_node.position)
             children.append(node)
@@ -194,7 +193,6 @@ def recalculate_next_cell_available(containers): #recalculate the positions wher
 def astar(start, containers, map, position_all_containers): #a-star implementation
     start_node = Node(position=start)
     start_node.containers = position_all_containers.copy()
-    start_node.map = map
     open = []
     close = []
     path = []
@@ -211,43 +209,44 @@ def astar(start, containers, map, position_all_containers): #a-star implementati
         print("postion current:",current_node.containers)
         if allArrived(current_node,containers): 
             exit = True
-        print(len(open))
-        children = generateChildren(current_node,containers)
-        
-        for child in children: #see if the children are in the closed vector, in the open vector and change the cost if they are already in the open vector
-            found = False
-             # Create the f and h values
-            if heur == "heuristic1": #calculate the heuristic
-                child.h = heuristic1(child,containers) #call to the heuristic
-            else:
-                pass #space for the second heuristic
-            child.f = child.g + child.h
-            for closed_node in close: #check if it is in closed_node
-                if child.containers == closed_node.containers and child.position == closed_node.position:
-                    found=True
-            if found == False:
-                for open_node in open: #check if it is in the open node
-                    if child.containers == open_node.containers and child.position == open_node.position:
-                        found = True
-                        if child.f < open_node.f:
-                            open.remove(open_node)   
-                            open.append(child)
-            if found == False:
-                open.append(child) 
-        open = bubble_sort(open) #sort the open vector from less cost to more
+            last_node= current_node
+        else:
+            print(len(open))
+            children = generateChildren(current_node,containers)
+            for child in children: #see if the children are in the closed vector, in the open vector and change the cost if they are already in the open vector
+                found = False
+                # Create the f and h values
+                if heur == "heuristic1": #calculate the heuristic
+                    child.h = heuristic1(child,containers) #call to the heuristic
+                else:
+                    pass #space for the second heuristic
+                child.f = child.g + child.h
+                for closed_node in close: #check if it is in closed_node
+                    if child.containers == closed_node.containers and child.position == closed_node.position:
+                        found=True
+                if found == False:
+                    for open_node in open: #check if it is in the open node
+                        if child.containers == open_node.containers and child.position == open_node.position:
+                            found = True
+                            if child.f < open_node.f:
+                                open.remove(open_node)   
+                                open.append(child)
+                if found == False:
+                    open.append(child) 
+            open = bubble_sort(open) #sort the open vector from less cost to more
 
     if exit: #close should be change with path (to be fixed)
-        path.append(current_node)
-        parent= current_node.parent
-        while parent!=None:
-            path.append(parent)
-            if parent!=None:  
-                parent = current_node.parent         
+        print("i enter here")
+        while last_node.containers != start_node.containers and last_node.position!=start_node.position:
+            path.append(last_node)
+            last_node = last_node.parent
+        path.append(start_node)
         solution = path
     else:
         solution = None
-
     return solution
+
+             
 
                         
 
@@ -256,6 +255,9 @@ def main():
     start = 0 #home port
     start_time = time.time()
     path = astar(start, containers, boat_map_2d,position_all_containers)
+    for cont in path:
+        print(cont.containers)
+        print(cont.position)
     end_time = time.time()
     t = (end_time - start_time )*1000
     print(t)
