@@ -1,0 +1,1 @@
+python3 a-star.py $1 $2 $3 $4
