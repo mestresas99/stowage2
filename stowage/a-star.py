@@ -72,7 +72,7 @@ def readInputs():
 
 
 def load(container, position):
-    position_dict = position_all_containers.copy()
+    position_dict = position_all_containers.deepcopy()
     position_dict.update({container[0]:position})
     return position_dict
 
@@ -98,7 +98,7 @@ def hasArrived(container):
 
 arrived = []
 def unload(container,port):
-    position_dict = position_all_containers.copy()
+    position_dict = position_all_containers.deepcopy()
     position = position_dict[container[0]]
     pos = -1 - position
     position_dict[container[0]] = [pos,pos]
@@ -202,7 +202,7 @@ def astar(start, containers, map):
     while len(open)>0 and not exit:
         current_node = open.pop(0)
         close.append(current_node)
-        position_all_containers = current_node.containers.copy()
+        position_all_containers = current_node.containers.deepcopy()
         recalculate_next_cell_available(current_node.containers)
         print("next cell av loop" + str(next_cell_available))
         #check if it is goal
