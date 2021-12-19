@@ -128,23 +128,29 @@ def samePort(container,position_boat): #check if we are in the same port that an
 
 def heuristic1(node,containers): #checks the number of operations left for arriving to the goal (relaxing the restriction of loading contianers that are on different port than when we are and supposing that we must arrive to port 2 at the end)
     num_to_load = 0
+    for c in node.containers.keys():
+        for cont in containers:
+            if cont[0] == c:
+                if node.containers[c][0] < 0 and node.containers[c][0]!=-1 - int(cont[2]):
+                    num_to_load+=1
+    sails_to_finish = 2 - node.position
+    return (2 *100000* num_to_load) + 4000*sails_to_finish
+
+
+def heuristic2(node, containers):
+    num_to_load = 0
     unloads_correct = 0
     unloads_incorrect = 0
-    for c in position_all_containers.keys():
+    for c in node.containers.keys():
         for cont in containers:
-            if cont == c:
-                if position_all_containers[c][0] < 0 and position_all_containers[c][0]!=-1 - cont[2]:
+            if cont[0] == c:
+                if node.containers[c][0] < 0 and node.containers[c][0]!=-1 - int(cont[2]):
                     num_to_load+=1
-                elif position_all_containers[c][0]>=0 and cont[2]==node.position:
+                elif node.containers[c][0]>=0 and cont[2]==node.position:
                     unloads_correct +=1
-                elif position_all_containers[c][0]>=0 and cont[2]!=node.position:
+                elif node.containers[c][0]>=0 and cont[2]!=node.position:
                     unloads_incorrect +=1
-    
-    sails_to_finish = 2 - node.position
-    return (2 *4000* num_to_load) + unloads_correct + 10000*unloads_incorrect + 4000*sails_to_finish
-
-
-#def heuristic2():
+    return (2 *100000* num_to_load) + unloads_correct + 1000*unloads_incorrect 
 
 def bubble_sort(open): #function for sorting the vector of nodes
     n = len(open)
@@ -219,7 +225,7 @@ def astar(start, containers, map, position_all_containers): #a-star implementati
                 if heur == "heuristic1": #calculate the heuristic
                     child.h = heuristic1(child,containers) #call to the heuristic
                 else:
-                    pass #space for the second heuristic
+                    child.h = heuristic2(child,containers) #space for the second heuristic
                 child.f = child.g + child.h
                 for closed_node in close: #check if it is in closed_node
                     if child.containers == closed_node.containers and child.position == closed_node.position:
@@ -236,7 +242,6 @@ def astar(start, containers, map, position_all_containers): #a-star implementati
             open = bubble_sort(open) #sort the open vector from less cost to more
 
     if exit: #close should be change with path (to be fixed)
-        print("i enter here")
         while last_node.parent:
             path_solution.append(last_node)
             last_node = last_node.parent
@@ -245,10 +250,6 @@ def astar(start, containers, map, position_all_containers): #a-star implementati
     else:
         solution = None
     return solution
-
-             
-
-                        
 
 def main():
     boat_map_2d,containers = readInputs()
@@ -262,6 +263,7 @@ def main():
     t = (end_time - start_time )*1000
     print(t)
     print(path)
+    print(len(path))
 
 if __name__ == '__main__':
     bool = main()
