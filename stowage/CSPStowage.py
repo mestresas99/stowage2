@@ -102,9 +102,11 @@ def main():
         containers_file = sys.argv[3]
         map_name,_ = os.path.splitext(map_file)
         containers_name,_ =os.path.splitext(containers_file)
-        file_name = "outputs/output-" + map_name + "-" + containers_name + ".output"
+        file_name = "output-" + map_name + "-" + containers_name + ".output"
         with open(file_name,'wb') as f: #include the output file
             if len(Solutions)!=0:
+                n_s = "Number of solutions:" + str(len(Solutions)) + "\n"
+                f.write(bytes(n_s, encoding = 'utf-8'))
                 for solution in Solutions:
                     solution = str(solution) + "\n"
                     f.write(bytes(solution, encoding = 'utf-8'))
@@ -116,7 +118,7 @@ def main():
         containers_file = sys.argv[3]
         map_name,_ = os.path.splitext(map_file)
         containers_name,_ =os.path.splitext(containers_file)
-        file_name = "outputs/output-" + map_name + "-" + containers_name + ".output"
+        file_name = "output-" + map_name + "-" + containers_name + ".output"
         with open(file_name,'wb') as f: #include the output file
             solution = "No solution for this problem: more containers than spaces in the boat"
             f.write(bytes(solution, encoding = 'utf-8'))
@@ -129,7 +131,7 @@ if __name__ == '__main__':
         containers_file = sys.argv[3]
         map_name,_ = os.path.splitext(map_file)
         containers_name,_ =os.path.splitext(containers_file)
-        file_name = "outputs/output-" + map_name + "-" + containers_name + ".output"
+        file_name = "output-" + map_name + "-" + containers_name + ".output"
         with open(file_name,'wb') as f: #include the output file
             solution = "Not enough refrigerated cells for the containers: no solutions for this problem"
             f.write(bytes(solution, encoding = 'utf-8'))
